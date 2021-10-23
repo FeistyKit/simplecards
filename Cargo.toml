@@ -10,4 +10,5 @@ crossterm = "0.20"
 tui = { version = "0.16", default-features = false, features = ['crossterm'] }
 serde = { version = "*", features = ["derive"]}
 serde_json = "*"
+serde_yaml = "*"
 directories = "*"
