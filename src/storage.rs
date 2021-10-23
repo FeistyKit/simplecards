@@ -3,15 +3,16 @@
 // TODO: implement saving to storage
 // TODO: implement configuration
 
-use crate::vocab::{VocabSet, VocabEntry};
+use crate::vocab::{VocabEntry, VocabSet};
 
 // Construct a set from specific rules
-pub fn construct_set(source_files: Vec<String>, config_file: Option<String>) -> Result<VocabSet, Box<dyn std::error::Error>> {
-    let mut dirs = directories::ProjectDirs::from("", "FeistyKit", "simplecards").ok_or("Could not open project directories!")?;
+pub fn construct_set(
+    source_files: Vec<String>,
+    config_file: Option<String>,
+) -> Result<VocabSet, Box<dyn std::error::Error>> {
+    let mut dirs = directories::ProjectDirs::from("", "FeistyKit", "simplecards")
+        .ok_or("Could not open project directories!")?;
     let mut unsorted_items: Vec<VocabEntry> = Vec::new();
-    // foo
-    // bar/baz
-    // jim
 
     // The base path for the files
     let base_data = dirs.data_dir().to_owned();

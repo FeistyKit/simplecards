@@ -1,5 +1,4 @@
-mod vocab;
 mod storage;
+mod vocab;
 
-fn main() {
-}
+fn main() {}
