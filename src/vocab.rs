@@ -4,7 +4,7 @@
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VocabEntry<'a>{
+pub struct VocabEntry{
     key: String,
     val: String,
     times: usize, // times tried
@@ -16,11 +16,11 @@ pub struct VocabEntry<'a>{
     // sort_number: Option<usize>,
 
     #[serde(skip_serializing)]
-    path: &'a str // the path that it was loaded from
+    path: String // the path that it was loaded from
 }
 
 #[allow (unused)]
-impl<'a> VocabEntry<'a> {
+impl VocabEntry {
     pub fn increment(&mut self, correct: bool) {
         self.times += 1;
         if correct {
@@ -41,10 +41,10 @@ pub enum VocabState {
 
 // The current set of worked vocabulary; Each individual entry will be saved, but the whole set will not be
 #[derive (Debug, Clone)]
-pub struct VocabSet<'a> {
-    passed: Vec<VocabEntry<'a>>,
-    failed: Vec<VocabEntry<'a>>,
-    untried: Vec<VocabEntry<'a>>,
+pub struct VocabSet {
+    passed: Vec<VocabEntry>,
+    failed: Vec<VocabEntry>,
+    untried: Vec<VocabEntry>,
     rules: VocabRules
 }
 
@@ -75,11 +75,11 @@ impl std::default::Default for VocabRules {
     }
 }
 
-impl<'a> VocabSet<'a> {
+impl VocabSet {
 
     // construct the set from unparsed items
     #[allow(unused)]
-    pub fn from_unparsed(items: Vec<VocabEntry<'a>>, rules: Option<VocabRules>) -> VocabSet<'a> {
+    pub fn from_unparsed(items: Vec<VocabEntry>, rules: Option<VocabRules>) -> VocabSet {
         let mut passed = Vec::new();
         let mut failed = Vec::new();
         let mut untried = Vec::new();
@@ -106,11 +106,11 @@ impl<'a> VocabSet<'a> {
 
     // Converts the set to a format that can be saved
     #[allow(unused)]
-    pub fn to_saveable(&self) -> (VocabRules, std::collections::HashMap<&'a str, Vec<VocabEntry<'a>>>) {
+    pub fn to_saveable(&self) -> (VocabRules, std::collections::HashMap<String, Vec<VocabEntry>>) {
         let mut map = std::collections::HashMap::new();
         let total_items = self.passed.iter().chain(self.failed.iter()).chain(self.untried.iter());
         for item in total_items {
-            map.entry(item.path).or_insert_with(Vec::new).push(item.clone());
+            map.entry(item.path.clone()).or_insert_with(Vec::new).push(item.clone());
         }
         (self.rules.clone(), map)
     }
