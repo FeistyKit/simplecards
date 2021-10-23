@@ -10,11 +10,10 @@ pub type AnyResult<T> = Result<T, Box<dyn std::error::Error>>;
 // Construct a set from specific rules
 pub fn construct_set(
     source_files: Vec<String>,
-    config_file: Option<String>, config_default: bool
-) -> Result<VocabSet, Box<dyn std::error::Error>> {
+    config_file: Option<String>,
+    config_default: bool,
+) -> AnyResult<VocabSet> {
     let unsorted_items = make_item_list(source_files)?;
-
-
 
     Ok(VocabSet::from_unparsed(unsorted_items, None))
 }
@@ -51,7 +50,6 @@ fn make_config(config_file: Option<String>, config_default: bool) -> VocabRules 
     }
 
     try_make_config(config_file).unwrap_or_default()
-
 }
 
 // Try to get the config from the options
@@ -60,7 +58,7 @@ fn try_make_config(config_file: Option<String>) -> AnyResult<VocabRules> {
         Some(raw_path) => {
             let string = std::fs::read_to_string(raw_path)?;
             Ok(serde_yaml::from_str(&string)?)
-        },
+        }
         None => {
             // finding the path of the config file
             let dirs = directories::ProjectDirs::from("", "FeistyKit", "simplecards")

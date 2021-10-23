@@ -18,12 +18,30 @@ pub struct VocabEntry {
     path: String, // the path that it was loaded from
 }
 
-#[allow(unused)]
 impl VocabEntry {
-    pub fn increment(&mut self, correct: bool) {
+    // Will be called when the user tries a vocab card
+    pub fn increment(&mut self, correct: bool, instant_change: bool) {
         self.times += 1;
         if correct {
             self.correct += 1;
+        }
+        if instant_change {
+            match correct {
+                true => self.state = VocabState::Passed,
+                false => self.state = VocabState::Failed,
+            }
+        }
+    }
+
+    // Allow the user to create new vocab entries on the fly
+    pub fn user_new(key: String, val: String, path: String) -> VocabEntry {
+        VocabEntry {
+            key,
+            val,
+            path,
+            times: 0,
+            correct: 0,
+            state: VocabState::Untried,
         }
     }
 }
@@ -76,8 +94,7 @@ impl std::default::Default for VocabRules {
 
 impl VocabSet {
     // construct the set from unparsed items
-    #[allow(unused)]
-    pub fn from_unparsed(items: Vec<VocabEntry>, rules: Option<VocabRules>) -> VocabSet {
+    pub fn from_unsorted(items: Vec<VocabEntry>, rules: Option<VocabRules>) -> VocabSet {
         let mut passed = Vec::new();
         let mut failed = Vec::new();
         let mut untried = Vec::new();
@@ -103,7 +120,8 @@ impl VocabSet {
     }
 
     // Converts the set to a format that can be saved
-    #[allow(unused)]
+    // Rules and items are separate because rules are in config.yml
+    // and items are in their own folders
     pub fn to_saveable(
         &self,
     ) -> (
