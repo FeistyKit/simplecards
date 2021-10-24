@@ -66,7 +66,7 @@ pub struct VocabSet {
 }
 
 // Rules for the set that will be loaded from a file or given via command line
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct VocabRules {
     shuffle: bool,         // Whether the lists should be shuffled on load/completion
     sorted: bool,          // Whether the lists should be sorted; not available right now
@@ -122,6 +122,7 @@ impl VocabSet {
     // Converts the set to a format that can be saved
     // Rules and items are separate because rules are in config.yml
     // and items are in their own folders
+    // TODO: make this use references and not clone
     pub fn to_saveable(
         &self,
     ) -> (
