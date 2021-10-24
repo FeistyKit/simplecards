@@ -1,6 +1,4 @@
 // Reading vocab and configuration from storage
-// TODO: implement saving to storage
-// TODO: implement configuration
 
 use crate::vocab::{VocabEntry, VocabRules, VocabSet};
 use std::io::Write;
@@ -88,18 +86,18 @@ fn try_make_config(config_file: Option<String>) -> AnyResult<VocabRules> {
 
 // save the total set
 pub fn save_set(
-    rules: VocabRules,
-    map: std::collections::HashMap<String, Vec<VocabEntry>>,
+    rules: &VocabRules,
+    map: std::collections::HashMap<&str, Vec<&VocabEntry>>,
 ) -> AnyResult<()> {
     // don't overwrite the config if the default rules were chosen
-    if rules != VocabRules::default() {
+    if rules != &VocabRules::default() {
         save_config(rules)?;
     }
     save_data(map)?;
     Ok(())
 }
 
-fn save_config(config: VocabRules) -> AnyResult<()> {
+fn save_config(config: &VocabRules) -> AnyResult<()> {
     // Finding where to save the info
     let mut config_file = config_dir()?;
     config_file.push("config");
@@ -113,7 +111,7 @@ fn save_config(config: VocabRules) -> AnyResult<()> {
     Ok(())
 }
 
-fn save_data(data: std::collections::HashMap<String, Vec<VocabEntry>>) -> AnyResult<()> {
+fn save_data(data: std::collections::HashMap<&str, Vec<&VocabEntry>>) -> AnyResult<()> {
     for (rel_path, to_save) in data.into_iter() {
         // Finding where to save the info
         let mut path = data_dir()?;

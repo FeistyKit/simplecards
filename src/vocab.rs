@@ -1,5 +1,4 @@
 // The structs and helpful methods that need to be used
-// TODO: implement these
 
 use serde::{Deserialize, Serialize};
 
@@ -74,8 +73,7 @@ pub struct VocabRules {
     debug_validate: bool,  // Whether the lists should only be validated on debug
     inc_passing: bool, // Whether failed items should be marked as succeeded whenever they are gotten right or only when they are all right in a row
     all_failing: bool, // Whether all items should be marked as failing by default
-    immut: bool,       // Whether or not the items should be modified
-                       // TODO: find a better name for this
+    fixed: bool,       // Whether or not the items should be modified
 }
 
 impl std::default::Default for VocabRules {
@@ -87,7 +85,7 @@ impl std::default::Default for VocabRules {
             debug_validate: true,
             inc_passing: false,
             all_failing: false,
-            immut: false,
+            fixed: false,
         }
     }
 }
@@ -122,12 +120,11 @@ impl VocabSet {
     // Converts the set to a format that can be saved
     // Rules and items are separate because rules are in config.yml
     // and items are in their own folders
-    // TODO: make this use references and not clone
-    pub fn to_saveable(
+    pub fn to_saveable<'a>(
         &self,
     ) -> (
-        VocabRules,
-        std::collections::HashMap<String, Vec<VocabEntry>>,
+        &VocabRules,
+        std::collections::HashMap<&str, Vec<&VocabEntry>>,
     ) {
         let mut map = std::collections::HashMap::new();
         let total_items = self
@@ -136,10 +133,10 @@ impl VocabSet {
             .chain(self.failed.iter())
             .chain(self.untried.iter());
         for item in total_items {
-            map.entry(item.path.clone())
+            map.entry(item.path.as_ref())
                 .or_insert_with(Vec::new)
-                .push(item.clone());
+                .push(item);
         }
-        (self.rules.clone(), map)
+        (&self.rules, map)
     }
 }
