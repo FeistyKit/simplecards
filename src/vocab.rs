@@ -94,7 +94,7 @@ impl std::default::Default for VocabRules {
 
 impl VocabSet {
     // construct the set from unparsed items
-    pub fn from_unsorted(items: Vec<VocabEntry>, rules: Option<VocabRules>) -> VocabSet {
+    pub fn from_unsorted(items: Vec<VocabEntry>, rules: VocabRules) -> VocabSet {
         let mut passed = Vec::new();
         let mut failed = Vec::new();
         let mut untried = Vec::new();
@@ -115,7 +115,7 @@ impl VocabSet {
             passed,
             failed,
             untried,
-            rules: rules.unwrap_or_default(),
+            rules,
         }
     }
 
