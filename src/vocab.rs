@@ -10,9 +10,6 @@ pub struct VocabEntry {
     correct: usize, // times correct
     state: VocabState,
 
-    // TODO: sorting?
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // sort_number: Option<usize>,
     #[serde(skip_serializing)]
     path: String, // the path that it was loaded from
 }
