@@ -1,0 +1,14 @@
+#+TITLE: Roadmap
+#+DESCRIPTION: A simple roadmap for the project
+#+AUTHOR: FeistyKit
+
+I'd like to start off with saying that this is the first time I've ever used org-mode, so I'm sorry if it looks bad.
+
+Anyways, the roadmap for the project:
+
+- [ ] tui for the program
+- [ ] decide upon sorted items
+- [ ] Decide whether or not to include a parser to generate cards from other sources like [[www.conjuguemos.com]] for example
+  -- Link to another repository?
+  -- Compile-time feature?
+- [ ] Parse a list into vocab cards
