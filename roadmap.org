@@ -6,9 +6,14 @@ I'd like to start off with saying that this is the first time I've ever used org
 
 Anyways, the roadmap for the project:
 
+- [ ] Add a 'vocab note' section for VocabEntry
 - [ ] tui for the program
 - [ ] decide upon sorted items
-- [ ] Decide whether or not to include a parser to generate cards from other sources like [[www.conjuguemos.com]] for example
-  -- Link to another repository?
-  -- Compile-time feature?
+- [ ] Decide whether or not to include a parser to generate cards from other sources like [[https://www.conjuguemos.com][conjuguemos.com]] for example
+  - Link to another repository?
+  - Compile-time feature?
 - [ ] Parse a list into vocab cards
+  + [ ] Allow input of files to parse
+  + [ ] Allow typing into a buffer to parse
+  + [ ] Allow customization of the word/definition delimiter
+  + [ ] Allow customization of the entry delimiter
