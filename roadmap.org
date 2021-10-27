@@ -10,8 +10,8 @@ Anyways, the roadmap for the project:
 - [ ] tui for the program
 - [ ] decide upon sorted items
 - [ ] Decide whether or not to include a parser to generate cards from other sources like [[https://www.conjuguemos.com][conjuguemos.com]] for example
-  - Link to another repository?
-  - Compile-time feature?
+  + Link to another repository?
+  + Compile-time feature?
 - [ ] Parse a list into vocab cards
   + [ ] Allow input of files to parse
   + [ ] Allow typing into a buffer to parse
