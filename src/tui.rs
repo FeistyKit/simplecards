@@ -32,7 +32,7 @@ pub fn run_tui() -> AnyResult<()> {
 
 // called every time the terminal is drawn
 fn termdraw<'a>(f: &mut TermFrame, quit: &mut bool, ) {
-    while let Some()
+    // while let Some()
 }
 
 // Get the next available event if one exists
@@ -47,7 +47,7 @@ struct TabState<'a> {
     index: usize,
     len: usize,
     tab_names: widgets::Tabs<'a>,
-    items: Vec<Box<dyn widgets::Widget>>,
+    items: Vec<WidgetType<'a>>,
     constraints: Vec<layout::Constraint>
 }
 
@@ -62,23 +62,23 @@ impl<'a> TabState<'a> {
     }
     //move the selected tab over by one to the left
     fn decrement(&mut self) {
-        if self.index <= 0 {
+        if self.index == 0 {
             self.index = self.len;
         } else {
             self.index -= 1;
         }
     }
     // get the details of the current tab if one exists, else return none
-    fn current_tab_details(&self) -> Option<Box<dyn widgets::Widget>> {
+    fn current_tab_details(&self) -> Option<WidgetType> {
         self.items.get(self.index).cloned()
     }
 
     // whew that's a long declaration.
-    fn new<T>(tab_names: Vec<T>, items: Vec<Box<dyn widgets::Widget>>, constraints: Vec<layout::Constraint>) -> Self
+    fn new<T>(tab_names: Vec<T>, items: Vec<WidgetType<'a>>, constraints: Vec<layout::Constraint>) -> Self
         where T: Into<text::Spans<'a>>
     {
         assert!(tab_names.len() == items.len(), "The number of tab names is not equal to the number of items! ({} != {})", tab_names.len(), items.len());
-        let tab_names = tab_names.into_iter().map(text::Spans::from).collect();
+        let tab_names = widgets::Tabs::new(tab_names.into_iter().map(|x| x.into()).collect());
         TabState {
             index: 0,
             len: items.len(),
@@ -94,13 +94,13 @@ impl<'a> TabState<'a> {
                 layout::Constraint::Length(3),
                 layout::Constraint::Min(0),
             ];
-        let titles = ["Tab1", "Tab2", "Tab3", "Tab4"].iter().cloned().map(text::Spans::from).collect();
+        let titles = vec!["Tab1", "Tab2", "Tab3", "Tab4"];
         let text = vec![text::Spans::from(vec![
             text::Span::raw("Test"),
             text::Span::styled("tab!", style::Style::default().fg(style::Color::Yellow))
         ])];
-        let items = vec![Box::new(widgets::Paragraph::new(text.clone())); 2];
-        Self::new(titles, text, constraints)
+        let items = vec![WidgetType::Paragraph(widgets::Paragraph::new(text.clone()).block(widgets::Block::default().borders(widgets::Borders::ALL).title("Paragraph title !!"))); 4];
+        Self::new(titles, items, constraints)
     }
 
     // draw the application
@@ -110,14 +110,37 @@ impl<'a> TabState<'a> {
             let chunks = layout::Layout::default()
                 .margin(1)
                 .constraints(
-                    self.constraints
+                    self.constraints.clone()
                 )
             .split(f.size());
-            let tabs = self.tab_names.cloned();
+            let tabs = self.tab_names.clone();
 
             // drawing the stuff
             f.render_widget(tabs, chunks[0]);
-            f.render_widget(item, chunks[1]);
+            item.draw(f, chunks[1]);
+        }
+    }
+}
+
+// A way to generalize over different widgets
+// I will add more variants as they are needed
+#[derive(Clone, Debug)]
+enum WidgetType<'a> {
+    Block(widgets::Block<'a>),
+    Paragraph(widgets::Paragraph<'a>)
+}
+
+impl<'a> WidgetType<'a> {
+    fn draw(&self, f: &mut TermFrame, area: layout::Rect) {
+        match self {
+            WidgetType::Block(b) => {
+                let other = b.clone();
+                f.render_widget(other, area);
+            },
+            WidgetType::Paragraph(p) => {
+                let other = p.clone();
+                f.render_widget(other, area);
+            }
         }
     }
 }
