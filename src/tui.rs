@@ -21,9 +21,12 @@ pub fn run_tui() -> AnyResult<()> {
     let mut term = prepare_terminal()?;
     let mut quit = false;
     let mut app = TabState::testing();
+    term.clear()?;
     while !quit {
         term.draw( |f| termdraw(f, &mut quit, &mut app))?;
     }
+    // TODO: implement neovim-like saving of the terminal and restoring after program has exited
+    term.clear()?;
     Ok(())
 }
 
@@ -87,15 +90,13 @@ impl<'a> TabState<'a> {
     }
 
     // whew that's a long declaration.
-    fn new<T>(tab_names: Vec<T>, items: Vec<WidgetType<'a>>, constraints: Vec<layout::Constraint>) -> Self
-        where T: Into<text::Spans<'a>>
+    // User must be sure that the number of tabs is the same as the number of items
+    fn new(tabs: widgets::Tabs<'a>, items: Vec<WidgetType<'a>>, constraints: Vec<layout::Constraint>) -> Self
     {
-        assert!(tab_names.len() == items.len(), "The number of tab names is not equal to the number of items! ({} != {})", tab_names.len(), items.len());
-        let tab_names = widgets::Tabs::new(tab_names.into_iter().map(|x| x.into()).collect());
         TabState {
             index: 0,
             len: items.len(),
-            tab_names,
+            tab_names: tabs,
             items,
             constraints
         }
@@ -107,13 +108,13 @@ impl<'a> TabState<'a> {
                 layout::Constraint::Length(3),
                 layout::Constraint::Min(0),
             ];
-        let titles = vec!["Tab1", "Tab2", "Tab3", "Tab4"];
+        let tabs = widgets::Tabs::new(["Tab1", "Tab2", "Tab3", "Tab4"].iter().cloned().map(text::Spans::from).collect()).block(widgets::Block::default().title("Tabs!").borders(widgets::Borders::ALL));
         let text = vec![text::Spans::from(vec![
-            text::Span::raw("Test"),
+            text::Span::raw("Test "),
             text::Span::styled("tab!", style::Style::default().fg(style::Color::Yellow))
         ])];
         let items = vec![WidgetType::Paragraph(widgets::Paragraph::new(text.clone()).block(widgets::Block::default().borders(widgets::Borders::ALL).title("Paragraph title !!"))); 4];
-        Self::new(titles, items, constraints)
+        Self::new(tabs, items, constraints)
     }
 
     // draw the application
