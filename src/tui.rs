@@ -8,6 +8,7 @@ use crossterm::event;
 fn prepare_terminal() -> AnyResult<tui::Terminal<tui::backend::CrosstermBackend<std::io::Stdout>>> {
     // https://docs.rs/tui/0.16.0/tui/index.html
     let stdout = std::io::stdout();
+    crossterm::terminal::enable_raw_mode()?;
     let backend = tui::backend::CrosstermBackend::new(stdout);
     Ok(tui::Terminal::new(backend)?)
 }
@@ -19,24 +20,36 @@ pub type TermFrame<'a> = tui::terminal::Frame<'a, tui::backend::CrosstermBackend
 pub fn run_tui() -> AnyResult<()> {
     let mut term = prepare_terminal()?;
     let mut quit = false;
+    let mut app = TabState::testing();
     while !quit {
-        term.draw( |f| termdraw(f, &mut quit))?;
+        term.draw( |f| termdraw(f, &mut quit, &mut app))?;
     }
     Ok(())
 }
 
-
-
-// I'm doing this to make the compiler a little less irritating at me:w
-//
-
 // called every time the terminal is drawn
-fn termdraw<'a>(f: &mut TermFrame, quit: &mut bool, ) {
-    // while let Some()
+fn termdraw<'a>(f: &mut TermFrame, quit: &mut bool, app: &mut TabState<'a>) {
+    while let Some(event) = next_event().expect("Could not get next event!") {
+        if let event::Event::Key(key_ev) = event {
+            match key_ev.code {
+                event::KeyCode::Char(last) => { // hopefully the last layer that needs to be dereferenced
+
+                    // quit on a press of 'q'
+                    // TODO: customize quit button
+                    if last.to_ascii_lowercase() == 'q' {
+                        *quit = true;
+                    }
+                },
+                _ => {},
+            }
+        }
+    }
+
+    app.draw(f);
 }
 
 // Get the next available event if one exists
-fn get_event() -> AnyResult<Option<event::Event>> {
+fn next_event() -> AnyResult<Option<event::Event>> {
     if event::poll(time::Duration::from_secs(0))? {
         return Ok(Some(event::read()?));
     }
